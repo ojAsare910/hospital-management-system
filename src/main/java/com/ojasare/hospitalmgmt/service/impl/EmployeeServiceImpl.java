@@ -1,5 +1,6 @@
 package com.ojasare.hospitalmgmt.service.impl;
 
+import com.ojasare.hospitalmgmt.config.CustomTransactional;
 import com.ojasare.hospitalmgmt.dto.DoctorDTO;
 import com.ojasare.hospitalmgmt.dto.NurseDTO;
 import com.ojasare.hospitalmgmt.entity.Department;
@@ -11,6 +12,7 @@ import com.ojasare.hospitalmgmt.service.DepartmentService;
 import com.ojasare.hospitalmgmt.service.EmployeeService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +20,6 @@ import java.util.List;
 
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -26,8 +27,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final NurseRepository nurseRepository;
     private final DepartmentService departmentService;
 
+    @Transactional
     @Override
     public Doctor createDoctor(DoctorDTO doctorDTO) {
+        if (doctorDTO.getSpeciality().isBlank() || doctorDTO.getSpeciality().isEmpty()
+                || doctorDTO.getFirstName().isEmpty() || doctorDTO.getFirstName().isBlank()
+        ) {
+            throw new IllegalArgumentException("These fields cannot be empty!");
+        }
         Doctor doctor = Doctor.builder()
                 .firstName(doctorDTO.getFirstName())
                 .surname(doctorDTO.getSurname())
@@ -38,6 +45,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return doctorRepository.save(doctor);
     }
 
+    @CustomTransactional
     public Doctor updateDoctor(Long doctorId, DoctorDTO doctorDTO) {
         return doctorRepository.findById(doctorId).map(doctor -> {
             doctor.setFirstName(doctorDTO.getFirstName());
@@ -49,12 +57,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         }).orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
     }
 
+    @Cacheable(value = "doctorsBySpeciality", key = "#speciality", unless = "#result.isEmpty()")
     @Override
     public List<Doctor> findDoctorsBySpeciality(String speciality) {
         return doctorRepository.findBySpeciality(speciality);
     }
 
-
+    @Transactional
     @Override
     public Nurse createNurse(NurseDTO nurseDTO) {
         Department department = departmentService.getDepartmentById(nurseDTO.getDepartmentId());
@@ -70,6 +79,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return nurseRepository.save(nurse);
     }
 
+    @CustomTransactional
     @Override
     public Nurse updateNurse(Long nurseId, NurseDTO nurseDTO) {
         return nurseRepository.findById(nurseId).map(nurse -> {
@@ -95,6 +105,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         return nurseRepository.findById(nurseId)
                 .orElseThrow(() -> new EntityNotFoundException("Nurse not found"));
     }
-
 
 }
