@@ -2,21 +2,34 @@ package com.ojasare.hospitalmgmt.service.impl;
 
 import com.ojasare.hospitalmgmt.config.CustomTransactional;
 import com.ojasare.hospitalmgmt.dto.DoctorDTO;
+import com.ojasare.hospitalmgmt.dto.EmployeeProjection;
 import com.ojasare.hospitalmgmt.dto.NurseDTO;
 import com.ojasare.hospitalmgmt.entity.Department;
 import com.ojasare.hospitalmgmt.entity.Doctor;
+import com.ojasare.hospitalmgmt.entity.Employee;
 import com.ojasare.hospitalmgmt.entity.Nurse;
 import com.ojasare.hospitalmgmt.repository.DoctorRepository;
+import com.ojasare.hospitalmgmt.repository.EmployeeRepository;
 import com.ojasare.hospitalmgmt.repository.NurseRepository;
 import com.ojasare.hospitalmgmt.service.DepartmentService;
 import com.ojasare.hospitalmgmt.service.EmployeeService;
+import com.ojasare.hospitalmgmt.specification.EmployeeSpecification;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.QueryHint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static org.hibernate.jpa.QueryHints.HINT_READONLY;
 
 
 @Service
@@ -26,6 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final DoctorRepository doctorRepository;
     private final NurseRepository nurseRepository;
     private final DepartmentService departmentService;
+    private final EmployeeRepository employeeRepository;
 
     @Transactional
     @Override
@@ -104,6 +118,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Nurse getNurseById(Long nurseId) {
         return nurseRepository.findById(nurseId)
                 .orElseThrow(() -> new EntityNotFoundException("Nurse not found"));
+    }
+
+    @Override
+    public Page<EmployeeProjection> getAllEmployees(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return employeeRepository.findAllEmployees(pageable);
+    }
+
+    @Override
+    public List<Employee> findEmployees(String firstName, String surname) {
+        return employeeRepository.findAll(Specification
+                .where(EmployeeSpecification.hasFirstName(firstName))
+                .or(EmployeeSpecification.hasSurname(surname)));
+    }
+
+    @QueryHints(value = @QueryHint(name = HINT_READONLY, value = "true"))
+    @Override
+    public List<Employee> getEmployeesByAddress(String address) {
+        return employeeRepository.findByAddress(address);
     }
 
 }
