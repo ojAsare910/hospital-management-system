@@ -17,6 +17,7 @@ import com.ojasare.hospitalmgmt.specification.EmployeeSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.QueryHint;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hibernate.jpa.QueryHints.HINT_READONLY;
 
@@ -44,11 +46,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public Doctor createDoctor(DoctorDTO doctorDTO) {
-        if (doctorDTO.getSpeciality().isBlank() || doctorDTO.getSpeciality().isEmpty()
-                || doctorDTO.getFirstName().isEmpty() || doctorDTO.getFirstName().isBlank()
-        ) {
-            throw new IllegalArgumentException("These fields cannot be empty!");
-        }
         Doctor doctor = Doctor.builder()
                 .firstName(doctorDTO.getFirstName())
                 .surname(doctorDTO.getSurname())
@@ -60,7 +57,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @CustomTransactional
-    public Doctor updateDoctor(Long doctorId, DoctorDTO doctorDTO) {
+    public Optional<Doctor> updateDoctor(Long doctorId, DoctorDTO doctorDTO) {
         return doctorRepository.findById(doctorId).map(doctor -> {
             doctor.setFirstName(doctorDTO.getFirstName());
             doctor.setSurname(doctorDTO.getSurname());
@@ -68,7 +65,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             doctor.setTelephoneNumber(doctorDTO.getTelephoneNumber());
             doctor.setSpeciality(doctorDTO.getSpeciality());
             return doctorRepository.save(doctor);
-        }).orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
+        });
     }
 
     @Cacheable(value = "doctorsBySpeciality", key = "#speciality", unless = "#result.isEmpty()")
@@ -80,13 +77,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public Nurse createNurse(NurseDTO nurseDTO) {
-        Department department = departmentService.getDepartmentById(nurseDTO.getDepartmentId());
         Nurse nurse = Nurse.builder()
                 .firstName(nurseDTO.getFirstName())
                 .surname(nurseDTO.getSurname())
                 .address(nurseDTO.getAddress())
                 .telephoneNumber(nurseDTO.getTelephoneNumber())
-                .department(department)
+                .department(departmentService.getDepartmentById(nurseDTO.getDepartmentId()))
                 .salary(nurseDTO.getSalary())
                 .rotation(nurseDTO.getRotation())
                 .build();
@@ -95,7 +91,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @CustomTransactional
     @Override
-    public Nurse updateNurse(Long nurseId, NurseDTO nurseDTO) {
+    public Optional<Nurse> updateNurse(Long nurseId, NurseDTO nurseDTO) {
         return nurseRepository.findById(nurseId).map(nurse -> {
             nurse.setFirstName(nurseDTO.getFirstName());
             nurse.setSurname(nurseDTO.getSurname());
@@ -105,19 +101,17 @@ public class EmployeeServiceImpl implements EmployeeService {
             nurse.setSalary(nurseDTO.getSalary());
             nurse.setRotation(nurseDTO.getRotation());
             return nurseRepository.save(nurse);
-        }).orElseThrow(() -> new EntityNotFoundException("Nurse not found"));
+        });
     }
 
     @Override
-    public Doctor getDoctorById(Long doctorId) {
-        return doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
+    public Optional<Doctor> getDoctorById(Long doctorId) {
+        return doctorRepository.findById(doctorId);
     }
 
     @Override
-    public Nurse getNurseById(Long nurseId) {
-        return nurseRepository.findById(nurseId)
-                .orElseThrow(() -> new EntityNotFoundException("Nurse not found"));
+    public Optional<Nurse> getNurseById(Long nurseId) {
+        return nurseRepository.findById(nurseId);
     }
 
     @Override

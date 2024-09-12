@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/nurse")
 @RequiredArgsConstructor
@@ -22,15 +24,15 @@ public class NurseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Nurse> getNurseById(@PathVariable Long id) {
-        Nurse nurse = employeeService.getNurseById(id);
+    public ResponseEntity<Optional<Nurse>> getNurseById(@PathVariable Long id) {
+        Optional<Nurse> nurse = employeeService.getNurseById(id);
         return ResponseEntity.ok(nurse);
     }
 
     // Update a Nurse
     @PutMapping("/update/{id}")
-    public ResponseEntity<Nurse> updateNurse(@PathVariable Long id, @RequestBody NurseDTO nurseDTO) {
-        Nurse updatedNurse = employeeService.updateNurse(id, nurseDTO);
+    public ResponseEntity<Optional<Nurse>> updateNurse(@PathVariable Long id, @RequestBody NurseDTO nurseDTO) {
+        Optional<Nurse> updatedNurse = employeeService.updateNurse(id, nurseDTO);
         return ResponseEntity.ok(updatedNurse);
     }
 
