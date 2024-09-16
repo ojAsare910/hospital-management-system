@@ -24,15 +24,15 @@ public class NurseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Nurse>> getNurseById(@PathVariable Long id) {
-        Optional<Nurse> nurse = employeeService.getNurseById(id);
+    public ResponseEntity<Nurse> getNurseById(@PathVariable Long id) {
+        Nurse nurse = employeeService.getNurseById(id);
         return ResponseEntity.ok(nurse);
     }
 
     // Update a Nurse
     @PutMapping("/update/{id}")
-    public ResponseEntity<Optional<Nurse>> updateNurse(@PathVariable Long id, @RequestBody NurseDTO nurseDTO) {
-        Optional<Nurse> updatedNurse = employeeService.updateNurse(id, nurseDTO);
+    public ResponseEntity<Nurse> updateNurse(@PathVariable Long id, @RequestBody NurseDTO nurseDTO) {
+        Nurse updatedNurse = employeeService.updateNurse(id, nurseDTO);
         return ResponseEntity.ok(updatedNurse);
     }
 

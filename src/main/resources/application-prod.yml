@@ -5,10 +5,16 @@ spring:
     url: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DB}?currentSchema=hospital_mgmt
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  main:
+    allow-bean-definition-overriding: true
 server:
   port: 8083
 logging:

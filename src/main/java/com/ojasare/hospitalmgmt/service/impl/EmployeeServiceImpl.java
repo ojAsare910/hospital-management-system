@@ -7,6 +7,7 @@ import com.ojasare.hospitalmgmt.dto.NurseDTO;
 import com.ojasare.hospitalmgmt.entity.Doctor;
 import com.ojasare.hospitalmgmt.entity.Employee;
 import com.ojasare.hospitalmgmt.entity.Nurse;
+import com.ojasare.hospitalmgmt.exception.NotFoundException;
 import com.ojasare.hospitalmgmt.repository.DoctorRepository;
 import com.ojasare.hospitalmgmt.repository.EmployeeRepository;
 import com.ojasare.hospitalmgmt.repository.NurseRepository;
@@ -60,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @CustomTransactional
     @CacheEvict(value = "doctorsBySpeciality", allEntries = true)
     @Override
-    public Optional<Doctor> updateDoctor(Long doctorId, DoctorDTO doctorDTO) {
+    public Doctor updateDoctor(Long doctorId, DoctorDTO doctorDTO) {
         return doctorRepository.findById(doctorId).map(doctor -> {
             doctor.setFirstName(doctorDTO.getFirstName());
             doctor.setSurname(doctorDTO.getSurname());
@@ -70,10 +71,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             Doctor updatedDoctor = doctorRepository.save(doctor);
             logger.info("Doctor updated successfully");
             return updatedDoctor;
-        });
+        }).orElseThrow(() -> new NotFoundException("Doctor not found with id: " + doctorId));
     }
 
-    @Cacheable(value = "doctorsBySpeciality", key = "#speciality", unless = "#result.isEmpty()")
+    @Cacheable(value = "doctorsBySpeciality", key = "#speciality", unless = "#result.isEmpty()", cacheManager = "caffeineCacheManager")
     @Transactional(readOnly = true)
     @Override
     public List<Doctor> findDoctorsBySpeciality(String speciality) {
@@ -85,9 +86,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Doctor> getDoctorById(Long doctorId) {
+    public Doctor getDoctorById(Long doctorId) {
         logger.debug("Fetching doctor with id: {}", doctorId);
-        return doctorRepository.findById(doctorId);
+        return doctorRepository.findById(doctorId).orElseThrow(() -> new NotFoundException("Doctor not found with id: " + doctorId));
     }
 
     @Transactional
@@ -110,7 +111,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @CustomTransactional
     @CacheEvict(value = "nurses", allEntries = true)
     @Override
-    public Optional<Nurse> updateNurse(Long nurseId, NurseDTO nurseDTO) {
+    public Nurse updateNurse(Long nurseId, NurseDTO nurseDTO) {
         return nurseRepository.findById(nurseId).map(nurse -> {
             nurse.setFirstName(nurseDTO.getFirstName());
             nurse.setSurname(nurseDTO.getSurname());
@@ -122,14 +123,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             Nurse updatedNurse = nurseRepository.save(nurse);
             logger.info("Nurse updated successfully");
             return updatedNurse;
-        });
+        }).orElseThrow(() -> new NotFoundException("Nurse not found with id: " + nurseId));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Nurse> getNurseById(Long nurseId) {
+    public Nurse getNurseById(Long nurseId) {
         logger.debug("Fetching nurse with id: {}", nurseId);
-        return nurseRepository.findById(nurseId);
+        return nurseRepository.findById(nurseId).orElseThrow(() -> new NotFoundException("Nurse not found with id: " + nurseId));
     }
 
     @Transactional(readOnly = true)
