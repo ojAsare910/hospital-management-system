@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,8 +23,8 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Doctor>> getDoctorById(@PathVariable Long id) {
-        Optional<Doctor> doctorDTO = employeeService.getDoctorById(id);
+    public ResponseEntity<Doctor> getDoctorById(@PathVariable Long id) {
+        Doctor doctorDTO = employeeService.getDoctorById(id);
         return ResponseEntity.ok(doctorDTO);
     }
 
@@ -35,8 +34,8 @@ public class DoctorController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Optional<Doctor>> updateDoctor(@PathVariable Long id, @RequestBody DoctorDTO doctorDTO) {
-        Optional<Doctor> updatedDoctor = employeeService.updateDoctor(id, doctorDTO);
+    public ResponseEntity<Doctor> updateDoctor(@PathVariable Long id, @RequestBody DoctorDTO doctorDTO) {
+        Doctor updatedDoctor = employeeService.updateDoctor(id, doctorDTO);
         return ResponseEntity.ok(updatedDoctor);
     }
 

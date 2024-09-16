@@ -13,12 +13,12 @@ import java.util.Optional;
 
 public interface EmployeeService {
     Doctor createDoctor(DoctorDTO doctorDTO);
-    Optional<Doctor> updateDoctor(Long doctorId, DoctorDTO doctorDTO);
+    Doctor updateDoctor(Long doctorId, DoctorDTO doctorDTO);
     List<Doctor> findDoctorsBySpeciality(String speciality);
     Nurse createNurse(NurseDTO nurseDTO);
-    Optional<Nurse> updateNurse(Long nurseId, NurseDTO nurseDTO);
-    Optional<Doctor> getDoctorById(Long id);
-    Optional<Nurse> getNurseById(Long id);
+    Nurse updateNurse(Long nurseId, NurseDTO nurseDTO);
+    Doctor getDoctorById(Long id);
+    Nurse getNurseById(Long id);
     Page<EmployeeProjection> getAllEmployees(int page, int size);
     List<Employee> findEmployees(String firstName, String surname);
     List<Employee> getEmployeesByAddress(String address);

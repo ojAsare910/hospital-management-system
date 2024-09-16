@@ -1,5 +1,6 @@
 package com.ojasare.hospitalmgmt.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class Department {
     @JoinColumn(name = "director_id")
     private Doctor director;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "department")
     private Set<Ward> wards;
 }

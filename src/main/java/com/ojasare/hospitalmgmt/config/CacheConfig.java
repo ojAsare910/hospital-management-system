@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CacheConfig {
 
-    @Bean
-    public CacheManager cacheManager() {
+    @Bean("caffeineCacheManager")
+    public CacheManager caffeineCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager("doctorsBySpeciality");
         cacheManager.setCaffeine(caffeineCacheBuilder());
         return cacheManager;
