@@ -22,3 +22,13 @@ logging:
     org:
       springframework:
         web: TRACE
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  security:
+    enabled: true
+  endpoint:
+    health:
+      show-details: always
