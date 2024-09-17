@@ -7,7 +7,6 @@ import com.ojasare.hospitalmgmt.exception.NotFoundException;
 import com.ojasare.hospitalmgmt.repository.DepartmentRepository;
 import com.ojasare.hospitalmgmt.repository.DoctorRepository;
 import com.ojasare.hospitalmgmt.service.DepartmentService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional
     @Override
     public Department createDepartment(DepartmentDTO departmentDTO) {
-        Doctor doctor = doctorRepository.findById(departmentDTO.getDirectorId()).orElseThrow(() -> new EntityNotFoundException("Invalid Director Id"));;
+        Doctor doctor = doctorRepository.findById(departmentDTO.getDirectorId()).orElseThrow(() -> new NotFoundException("Invalid Director Id"));
         Department department = Department.builder()
                 .name(departmentDTO.getName())
                 .code(departmentDTO.getCode())
