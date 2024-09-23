@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Endpoint(id = "custom")
 public class CustomEndpoint {
 
-    private String status = "OK";
+    private String status = "ONLINE";
 
     @ReadOperation
     public CustomInfo getInfo() {
